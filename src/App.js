@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import AddPostForm from "./features/post/AddPostForm";
+import PostList from "./features/post/PostList";
+import Navbar from "./app/Navbar";
+import { Routes, Route } from 'react-router-dom';
+import SinglePost from "./features/post/SinglePost";
+import EditPost from './features/post/EditPost'
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div >
+      <Navbar />
+      <div className="container">
+        <Routes>
+        {/* public routes */}
+        <Route exact path="/" element={<PostList/>}/>
+        <Route exact path="create" element={<AddPostForm />} />
+        <Route exact path="post/:id" element={<SinglePost />} />
+        <Route exact path="edit/:id" element={<EditPost/>}/>
+        {/* Catches All Routes that does not match the above routes*/}
+        <Route  path="*" element={<PostList/>} />
+      </Routes>
+      </div>
     </div>
   );
 }
