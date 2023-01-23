@@ -1,41 +1,38 @@
-import { useSelector } from 'react-redux';
-import { selectAllPosts } from './postSlice';
-import PostAuthor from './PostAuthor';
-import TimeAgo from './TimeAgo';
-import ReactionButtons from './ReactionButtons'
-import { Link } from 'react-router-dom';
-
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectAllPosts,getPostsError,getPostsStatus ,fetchPosts} from './postSlice';
+import PostsExcerpt from './PostsExcerpt';
 
 const PostList = () => {
+  const dispatch = useDispatch()
   const posts = useSelector(selectAllPosts)
+  const postStatus = useSelector(getPostsStatus)
+  const error = useSelector(getPostsError)
+
+useEffect(() => {
+  if (postStatus === 'idle') {
+    dispatch(fetchPosts())
+  }
+}, [postStatus, dispatch])
+
+  let content;
+  
+  if (postStatus === 'loading') {
+    content = <p>Loading...</p>
+  }
+  else if (postStatus === 'succeeded') {
     const orderedPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date))
+    content = orderedPosts.map((post,index )=> <PostsExcerpt key={ index} post={post} />)
+  }
+  else if (postStatus === 'failed') {
+    content = <p>{ error}</p>
+  }
+
 
   return (
       <div className='row'>
-          <h2 className='text-center my-3'>Posts</h2>
-          {
-              orderedPosts.map((post) => {
-                  return (
-                    
-<div className="card m-3 col-md-5 " key={post.id}>
-  <div className="card-body">
-    <h5 className="card-title">{post.title}</h5>
-    <h6 className="card-subtitle mb-2 text-muted">
-    <PostAuthor userId={post.user} />
-    </h6>
-    <p className='text-muted'>
-    <TimeAgo timestamp={post.date}/> 
-    </p>
-    <p className="card-text">
-    { post.content.substring(0,100)}...
-    </p>
-    <ReactionButtons post={post}/>
-    <Link to={`/post/${post.id}`} className="card-link">Visit Post</Link>
-  </div>
-</div>
-                  )
-              })
-          }
+      <h2 className='text-center my-3'>Posts</h2>
+      {content}
     </div>
   )
 }

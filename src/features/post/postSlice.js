@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, nanoid } from '@reduxjs/toolkit'
-// import {sub} from 'date-fns'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import {sub} from 'date-fns'
 import axios from 'axios'
 
 const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
@@ -10,72 +10,80 @@ const initialState = {
     error:null
 }
 
-export const fetchPosts = createAsyncThunk('posts/fetchPosts',async()=>{
-    const response = await axios.get(POST_URL)
-    return [...response.data]
+/*
+asycn thunk accepts two arguements
+A string => The string is used as the prefix for the generated action type
+callback function => The callback function is a payload creator callback. its returns a promise that
+contains some data or rejected promise with an error
+ */
+export const fetchPosts = createAsyncThunk('posts/fetchPosts', async ()=>{
+    const response = await axios.get(POSTS_URL)
+    return response.data
+})
+
+export const addNewPost = createAsyncThunk('posts/addNewPost', async (initialPost) => {
+    const response = await axios.post(POSTS_URL, initialPost)
+    return response.data
 })
 
 const postsSlice= createSlice({
     name:'posts',
     initialState,
     reducers: {
-        postAdded: {
-            reducer(state, action) {
-                state.posts.push(action.payload)
-            },
-            prepare(post) {
-                return {
-                    payload: {
-                        id: nanoid(),
-                        user:post.userId,
-                        title: post.title,
-                        content: post.content,
-                        date:new Date().toISOString(),
-                        reactions: {
+    },
+    extraReducers(builder) {
+            builder
+                .addCase(fetchPosts.pending, (state, action) => {
+                    state.status = 'loading'
+                })
+                .addCase(fetchPosts.fulfilled, (state, action) => {
+                    state.status = 'succeeded'
+                    // Adding date and reactions
+                    let min = 1;
+                    const loadedPosts = action.payload.map(post => {
+                        post.date = sub(new Date(), { minutes: min++ }).toISOString()
+                        post.reactions = {
                             thumbsUp: 0,
                             wow: 0,
                             heart: 0,
                             rocket: 0,
                             coffee: 0
-        }
+                        }
+                        return post
+                    })
+                    // add any fetched posts to the array
+                    state.posts = state.posts.concat(loadedPosts)
+                })
+                .addCase(fetchPosts.rejected, (state, action) => {
+                    state.status = 'failed'
+                    state.error = action.error.message
+                })
+                .addCase(addNewPost.fulfilled, (state, action) => {
+                    const sortedPosts = state.posts.sort((a, b) => {
+                        if (a.id > b.id) return 1
+                        if (a.id < b.id) return -1
+                        return 0
+                    })
+                    action.payload.id = sortedPosts[sortedPosts.length - 1].id + 1
+                    action.payload.useId = Number(action.payload.useId)
+                    action.payload.date = new Date().toISOString()
+                    action.payload.reactions = {
+                            thumbsUp: 0,
+                            wow: 0,
+                            heart: 0,
+                            rocket: 0,
+                            coffee: 0
                     }
-                }
-            }
+                    console.log(action.payload)
+                    state.posts.push(action.payload)
+            })
         },
-        reactionAdded:(state,action)=>{
-            const{postId,reaction}=action.payload
-            const existingPost = state.posts.find(post => post.id === postId)
-            if(existingPost){
-                existingPost.reactions[reaction]++
-            }
-        },
-        postEdit: (state, action)=>{
-            const {id,post } = action.payload
-            const existingPost = state.posts.find(post => post.id === id)
-            if (existingPost) {
-                existingPost.title = post.title
-                existingPost.content = post.content
-                if (existingPost.userId) {
-                    existingPost.userId = post.userId
-                }
-                else {
-                    existingPost['useId']=post.useId
-                }
-            }
-         },
-        postDelete: (state, action) => {
-            const id = action.payload
-            //arr.splice(position,howmany,items)
-            /* to be able to mutate the state we need to remove the item using the splice method
-            The splice method takes in the position of of the element that you want to remove and how many elements to remove
-                    arr.splice(position(index of the post),how many items to remove)
-             */
-            state.posts.splice(state.findIndex((post)=> post.id = id),1)
-        }
-    }
 })
 
 export const selectAllPosts = (state) => state.posts.posts
+export const getPostsError = (state) => state.posts.error
+export const getPostsStatus = (state) => state.posts.status
+
 export const {postAdded,reactionAdded,postDelete,postEdit}=postsSlice.actions
 
 export default postsSlice.reducer
