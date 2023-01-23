@@ -1,15 +1,16 @@
 import { useDispatch ,useSelector} from 'react-redux';
-import { postAdded } from './postSlice';
 import { useState } from 'react'
 import { selectAllUsers } from '../users/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { addNewPost } from './postSlice';
+
 
 
 const AddPostForm = () => {
     const dispatch = useDispatch()
     const users = useSelector(selectAllUsers)
     const nagivate = useNavigate()
-
+    const [addRequestStatus, setAddRequestStatus] = useState('idle')
     const [post, setPost] = useState({
         title: "",
         content: "",
@@ -25,23 +26,28 @@ const AddPostForm = () => {
         })
     }
 
-    const canSave = Boolean(post.title) && Boolean(post.content) && Boolean(post.userId)
+    const canSave = [post.title,post.content,post.userId].every(Boolean) && addRequestStatus === 'idle'
 
     function handleSubmit(e) {
         e.preventDefault()
         if (canSave) {
-            dispatch(postAdded(post))
-            setPost( {
-                title: '',
-                content: "",
-                userId:''
-            })
-            nagivate('/',{replace:true})
+            try {
+                setAddRequestStatus('pending')
+                dispatch(addNewPost(post))
+                setPost( {
+                    title: '',
+                    content: "",
+                    userId:''
+                })
+                nagivate('/',{replace:true})
+            }
+            catch (err) {
+                console.error('Failed to save the post')
+            }
+            finally {
+                setAddRequestStatus('idle')
+            }
         }
-        else {
-            console.log('Enter all the values')
-        }
-        
     }
     return (
         <section className='container'>
