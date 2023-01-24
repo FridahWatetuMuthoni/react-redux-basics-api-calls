@@ -13,7 +13,7 @@ const AddPostForm = () => {
     const [addRequestStatus, setAddRequestStatus] = useState('idle')
     const [post, setPost] = useState({
         title: "",
-        content: "",
+        body: "",
         userId:""
     })
 
@@ -24,9 +24,10 @@ const AddPostForm = () => {
                 [e.target.name]:e.target.value
             }
         })
+        console.log(post)
     }
 
-    const canSave = [post.title,post.content,post.userId].every(Boolean) && addRequestStatus === 'idle'
+    const canSave = [post.title,post.body,post.userId].every(Boolean) && addRequestStatus === 'idle'
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -72,7 +73,7 @@ const AddPostForm = () => {
                 </div>
                 <div className='mb-3'>
                 <label className='form-label' htmlFor="content">Content: </label>
-                <textarea  className='form-control' name="content" id="content" value={post.content} onChange={handleChange}  rows="3" />
+                <textarea  className='form-control' name="body" id="content" value={post.content} onChange={handleChange}  rows="3" />
                 </div>
                 <button className='btn btn-primary' type='submit' disabled={!canSave}>Submit</button>
             </form>

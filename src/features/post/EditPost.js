@@ -1,9 +1,8 @@
 import { useDispatch ,useSelector} from 'react-redux';
-import { postEdit } from './postSlice';
 import { useState } from 'react'
 import { selectAllUsers } from '../users/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { selectAllPosts } from './postSlice';
+import { selectPostById,updatePosts} from './postSlice';
 import { useParams } from 'react-router-dom'
 
 
@@ -13,11 +12,11 @@ const EditPost= () => {
   const { id } = useParams()
   const dispatch = useDispatch()
   const nagivate =useNavigate()
-  const current_post = useSelector(selectAllPosts).find(post => post.id === id)
+  const current_post = useSelector(state => selectPostById(state, Number(id)))
 
     const [post, setPost] = useState({
         title: current_post.title,
-        content: current_post.content,
+        body: current_post.body,
         userId:current_post.userId
     })
 
@@ -30,7 +29,7 @@ const EditPost= () => {
         })
     }
 
-    const canSave = Boolean(post.title) && Boolean(post.content) 
+    const canSave = Boolean(post.title) && Boolean(post.body) 
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -39,7 +38,7 @@ const EditPost= () => {
                 id:current_post.id,
                 post:post,
             }
-            dispatch(postEdit(new_obj))
+            dispatch(updatePosts(new_obj))
             nagivate('/',{replace:true})
         }
         else {
@@ -70,7 +69,7 @@ const EditPost= () => {
                 </div>
                 <div className='mb-3'>
                 <label className='form-label' htmlFor="content">Content: </label>
-                <textarea  className='form-control' name="content" id="content" value={post.content} onChange={handleChange}  rows="3" />
+                <textarea  className='form-control' name="body" id="content" value={post.body} onChange={handleChange}  rows="3" />
                 </div>
                 <button className='btn btn-primary' type='submit' disabled={!canSave}>Submit</button>
             </form>

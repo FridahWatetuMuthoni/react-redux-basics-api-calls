@@ -26,15 +26,35 @@ export const addNewPost = createAsyncThunk('posts/addNewPost', async (initialPos
     return response.data
 })
 
+export const updatePosts = createAsyncThunk('posts/updatePost', async (initialPost) => {
+    const { id } = initialPost
+    const response = await axios.put(`${POSTS_URL}/${id}`, initialPost)
+    return response.data
+})
+
+export const deletePost = createAsyncThunk('posts/deletePost', async (initialPost) => {
+    const { id } = initialPost
+    const response = await axios.put(`${POSTS_URL}/${id}`, initialPost)
+    return response.data
+})
+
+
 const postsSlice= createSlice({
     name:'posts',
     initialState,
     reducers: {
+        reactionAdded(state, action) {
+            const { postId, reaction } = action.payload
+            const existingPost = state.posts.find(post => post.id === postId)
+            if (existingPost) {
+                existingPost.reactions[reaction]++
+            }
+        }
     },
     extraReducers(builder) {
             builder
                 .addCase(fetchPosts.pending, (state, action) => {
-                    state.status = 'loading'
+                    state.status = 'loading';
                 })
                 .addCase(fetchPosts.fulfilled, (state, action) => {
                     state.status = 'succeeded'
@@ -52,7 +72,7 @@ const postsSlice= createSlice({
                         return post
                     })
                     // add any fetched posts to the array
-                    state.posts = state.posts.concat(loadedPosts)
+                    state.posts = loadedPosts
                 })
                 .addCase(fetchPosts.rejected, (state, action) => {
                     state.status = 'failed'
@@ -74,16 +94,41 @@ const postsSlice= createSlice({
                             rocket: 0,
                             coffee: 0
                     }
-                    console.log(action.payload)
                     state.posts.push(action.payload)
-            })
+                })
+                .addCase(updatePosts.fulfilled, (state, action) => {
+                    if (!action.payload?.id) {
+                        console.log('update could not be complere')
+                        console.log(action.payload)
+                        return
+                    }
+                    const { id } = action.payload
+                    action.payload.date = new Date().toISOString()
+                    const posts = state.posts.filter(post => post.id !== id)
+                    state.posts = [...posts,action.payload]
+                })
+                .addCase('deletePost', (state, action) => {
+                    if (!action.payload?.id) {
+                        console.log('Delete could not be complete')
+                        console.log(action.payload)
+                        return
+                    }
+                    const { id } = action.payload
+                    const posts = state.posts.filter(post => post.id !== id)
+                    state.posts  =posts
+        })
         },
 })
 
 export const selectAllPosts = (state) => state.posts.posts
 export const getPostsError = (state) => state.posts.error
 export const getPostsStatus = (state) => state.posts.status
+export const selectPostById = (state, id) => {
+    const singlePost = state.posts.posts.find(post => post.id === id)
+    return singlePost
+}
 
-export const {postAdded,reactionAdded,postDelete,postEdit}=postsSlice.actions
+export const { postAdded, reactionAdded, postDelete, postEdit } = postsSlice.actions
+
 
 export default postsSlice.reducer

@@ -7,10 +7,12 @@ import { Link } from 'react-router-dom';
 const PostsExcerpt = ({post}) => {
     return (
 <div className="card m-3 col-md-5 ">
-  <div className="card-body">
+        {
+          post ? (
+      <div className="card-body">
     <h5 className="card-title">{post.title}</h5>
     <h6 className="card-subtitle mb-2 text-muted">
-    <PostAuthor userId={post.user} />
+    <PostAuthor userId={post.userId} />
     </h6>
     <p className='text-muted'>
     <TimeAgo timestamp={post.date}/> 
@@ -21,6 +23,8 @@ const PostsExcerpt = ({post}) => {
     <ReactionButtons post={post}/>
     <Link to={`/post/${post.id}`} className="card-link">Visit Post</Link>
   </div>
+          ):(<p>Something went wrong</p>)
+  }
 </div>
   )
 }

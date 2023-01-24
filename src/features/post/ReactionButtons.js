@@ -14,7 +14,7 @@ function ReactionButtons({post}) {
     const reaction_buttons = reactions_arr.map(([name,emoji])=>{
         return(
             <button key={name} type='button' className="reactionButton"
-            onClick={()=>{
+            onClick={() => {
                 dispatch(reactionAdded({postId:post.id,reaction:name}))
             }}
             >
