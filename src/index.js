@@ -8,8 +8,11 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import { fetchUsers } from './features/users/userSlice';
+import { fetchPosts } from './features/post/postSlice'
 
+//Loading data when the app is initialized
 store.dispatch(fetchUsers())
+store.dispatch(fetchPosts())
 
 
 
