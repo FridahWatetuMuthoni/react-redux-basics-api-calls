@@ -7,7 +7,8 @@ const POSTS_URL = 'https://jsonplaceholder.typicode.com/posts';
 const initialState = {
     posts:[],
     status:"idle", // idle | loading | succeeded | failed
-    error:null
+    error: null,
+    count:0
 }
 
 /*
@@ -50,6 +51,9 @@ const postsSlice= createSlice({
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
+        },
+        increaseCount(state, action) {
+            state.count = state.count + 1
         }
     },
     extraReducers(builder) {
@@ -125,12 +129,13 @@ const postsSlice= createSlice({
 export const selectAllPosts = (state) => state.posts.posts
 export const getPostsError = (state) => state.posts.error
 export const getPostsStatus = (state) => state.posts.status
+export const getCount = (state)=> state.posts.count
 export const selectPostById = (state, id) => {
     const singlePost = state.posts.posts.find(post => post.id === id)
     return singlePost
 }
 
-export const {  reactionAdded} = postsSlice.actions
+export const {  reactionAdded,increaseCount} = postsSlice.actions
 
 
 export default postsSlice.reducer
