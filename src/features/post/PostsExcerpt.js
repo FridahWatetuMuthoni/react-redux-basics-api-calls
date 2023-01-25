@@ -18,7 +18,7 @@ const PostsExcerpt = ({post}) => {
     <TimeAgo timestamp={post.date}/> 
     </p>
     <p className="card-text">
-    { post.body.substring(0,100)}...
+    { post.body.substring(0,75)}...
     </p>
     <ReactionButtons post={post}/>
     <Link to={`/post/${post.id}`} className="card-link">Visit Post</Link>

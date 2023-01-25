@@ -12,13 +12,22 @@ const EditPost= () => {
   const { id } = useParams()
   const dispatch = useDispatch()
   const nagivate =useNavigate()
-  const current_post = useSelector(state => selectPostById(state, Number(id)))
+    const current_post = useSelector(state => selectPostById(state, Number(id)))
 
     const [post, setPost] = useState({
-        title: current_post.title,
-        body: current_post.body,
-        userId:current_post.userId
+        title: current_post?.title,
+        body: current_post?.body,
+        userId:current_post?.userId
     })
+
+        
+    if (!current_post) {
+        return (
+            <section>
+                <h2>Post not found</h2>
+            </section>
+        )
+    }
 
     function handleChange(e) {
         setPost((prev) => {
@@ -34,10 +43,16 @@ const EditPost= () => {
     function handleSubmit(e) {
         e.preventDefault()
         if (canSave) {
+            const new_post = {
+                id: current_post.id,
+                reactions:current_post.reactions,
+                ...post
+            }
             const new_obj = {
                 id:current_post.id,
-                post:post,
+                post:new_post,
             }
+            console.log(new_obj)
             dispatch(updatePosts(new_obj))
             nagivate('/',{replace:true})
         }

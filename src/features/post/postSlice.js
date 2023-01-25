@@ -27,15 +27,15 @@ export const addNewPost = createAsyncThunk('posts/addNewPost', async (initialPos
 })
 
 export const updatePosts = createAsyncThunk('posts/updatePost', async (initialPost) => {
-    const { id } = initialPost
-    const response = await axios.put(`${POSTS_URL}/${id}`, initialPost)
+    const { id,post } = initialPost
+    const response = await axios.put(`${POSTS_URL}/${id}`, post)
     return response.data
 })
 
 export const deletePost = createAsyncThunk('posts/deletePost', async (initialPost) => {
-    const { id } = initialPost
-    const response = await axios.put(`${POSTS_URL}/${id}`, initialPost)
-    return response.data
+    const response = await axios.put(`${POSTS_URL}/${initialPost}`)
+    if (response?.status === 200) return initialPost
+    return`${response?.status}:${response?.statusText}`
 })
 
 
@@ -46,6 +46,7 @@ const postsSlice= createSlice({
         reactionAdded(state, action) {
             const { postId, reaction } = action.payload
             const existingPost = state.posts.find(post => post.id === postId)
+            console.log(postId)
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
@@ -105,9 +106,10 @@ const postsSlice= createSlice({
                     const { id } = action.payload
                     action.payload.date = new Date().toISOString()
                     const posts = state.posts.filter(post => post.id !== id)
-                    state.posts = [...posts,action.payload]
+                    state.posts = [...posts, action.payload]
+                    console.log(state.posts)
                 })
-                .addCase('deletePost', (state, action) => {
+                .addCase(deletePost.fulfilled, (state, action) => {
                     if (!action.payload?.id) {
                         console.log('Delete could not be complete')
                         console.log(action.payload)
@@ -128,7 +130,7 @@ export const selectPostById = (state, id) => {
     return singlePost
 }
 
-export const { postAdded, reactionAdded, postDelete, postEdit } = postsSlice.actions
+export const {  reactionAdded} = postsSlice.actions
 
 
 export default postsSlice.reducer
