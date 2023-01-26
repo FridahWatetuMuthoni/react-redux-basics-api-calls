@@ -13,7 +13,7 @@ function SingleUser() {
     const postsForUser = useSelector(state =>selectPostsByUser(state,Number(id)))
   
     console.log(postsForUser)
-     let  content = postsForUser.map((post,index )=> <PostsExcerpt key={ index} post={post} />)
+     let  content = postsForUser.map((post )=> <PostsExcerpt key={ post.id} postId={post.id} />)
   return (
     <section>
           {

@@ -8,6 +8,7 @@ import { selectPostById } from './postSlice';
 
 const PostsExcerpt = ({ postId }) => {
   const post = useSelector(state => selectPostById(state,postId))
+
     return (
 <div className="card m-3 col-md-5 ">
         {
