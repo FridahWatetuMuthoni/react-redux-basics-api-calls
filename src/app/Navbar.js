@@ -5,7 +5,7 @@ import { increaseCount,getCount } from '../features/post/postSlice'
 
 const Navbar = () => {
   const dispatch = useDispatch()
-  const count = useSelector(getCount())
+  const count = useSelector(getCount)
   return (
 <nav className="navbar navbar-expand-lg navbar-light bg-light">
   <div className="container-fluid">
@@ -18,7 +18,7 @@ const Navbar = () => {
         <Link className="nav-link" to='posts'>Posts</Link>
             <Link className="nav-link" to='/create'>Create</Link>
             <Link className="nav-link" to='/users'>Users</Link>
-            <button onClick={()=> dispatch(increaseCount())}>{ count}</button>
+            <button className='btn btn-primary btn-sm btn-custom' onClick={()=> dispatch(increaseCount())}>{ count}</button>
       </div>
     </div>
   </div>

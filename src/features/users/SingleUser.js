@@ -2,17 +2,16 @@ import React from 'react'
 import { useSelector} from 'react-redux'
 import { selectUserById } from './userSlice'
 import { useParams } from 'react-router-dom'
-import { selectAllPosts } from '../post/postSlice'
+import {  selectPostsByUser } from '../post/postSlice'
 import PostsExcerpt from '../post/PostsExcerpt'
 
 
 function SingleUser() {
     const { id } = useParams()
-    const user = useSelector(state => selectUserById(state, Number(id)))
-    const postsForUser = useSelector(state => {
-    const allPosts = selectAllPosts(state)
-        return allPosts.filter(post=>post.userId === Number(id))
-    })
+  const user = useSelector(state => selectUserById(state, Number(id)))
+  
+    const postsForUser = useSelector(state =>selectPostsByUser(state,Number(id)))
+  
     console.log(postsForUser)
      let  content = postsForUser.map((post,index )=> <PostsExcerpt key={ index} post={post} />)
   return (

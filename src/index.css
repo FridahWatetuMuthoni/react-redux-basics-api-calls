@@ -90,3 +90,7 @@ body{
 .shadow-none {
     box-shadow: none!important;
 }
+
+.btn-custom{
+  width: 50px;
+}
