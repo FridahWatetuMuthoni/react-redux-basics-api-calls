@@ -22,3 +22,7 @@
  React redux toolkit provides a createEntityAdapter API that abstracts more logic for components
  builtin CRUD methods
  Automatic selector generation
+
+## Example Project
+
+<https://www.positronx.io/react-redux-handle-api-calls-with-thunk-middleware-tutorial/>
